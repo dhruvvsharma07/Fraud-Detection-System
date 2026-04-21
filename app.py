@@ -23,14 +23,21 @@ def load_data():
     data = fetch_openml("creditcard", version=1, as_frame=True)
     df = data.frame
 
-    # 🔥 FIX: ensure correct column name
+    # 🔥 CRITICAL FIX
+    df.columns = df.columns.str.strip()  # remove weird spaces
+
+    # handle lowercase issue
     if "class" in df.columns:
         df.rename(columns={"class": "Class"}, inplace=True)
 
-    # Convert target column
+    # safety check
+    if "Class" not in df.columns:
+        st.error(f"Column 'Class' not found. Columns are: {df.columns}")
+        st.stop()
+
     df["Class"] = df["Class"].astype(int)
 
-    # Sampling (balanced)
+    # sampling
     df = df.groupby("Class", group_keys=False).apply(
         lambda x: x.sample(min(len(x), 25000), random_state=42)
     )

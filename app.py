@@ -10,43 +10,28 @@ from sklearn.pipeline import Pipeline
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import ConfusionMatrixDisplay, RocCurveDisplay
 
-# -------------------------------
-# PAGE SETUP
-# -------------------------------
 st.set_page_config(page_title="Fraud Detection System", layout="wide")
-st.title("💳 Credit Card Fraud Detection System")
+st.title("Credit Card Fraud Detection System")
 
-# -------------------------------
-# LOAD DATA (SAFE VERSION)
-# -------------------------------
 @st.cache_data
 def load_data():
     data = fetch_openml("creditcard", version=1, as_frame=True)
 
-    # Features
+    
     X = data.data.copy()
 
-    # Target (THIS IS IMPORTANT)
     y = pd.Series(data.target, name="Class").astype(int)
 
-    # Combine
     df = pd.concat([X, y], axis=1)
 
     return df
 
-# 🔥 MUST CALL THIS
 df = load_data()
 
-# -------------------------------
-# BASIC CHECK
-# -------------------------------
 if "Class" not in df.columns:
     st.error(f"Dataset error. Columns found: {df.columns}")
     st.stop()
 
-# -------------------------------
-# SPLIT DATA
-# -------------------------------
 X = df.drop(columns=["Class"])
 y = df["Class"]
 
@@ -54,9 +39,6 @@ X_train, X_test, y_train, y_test = train_test_split(
     X, y, test_size=0.2, random_state=42, stratify=y
 )
 
-# -------------------------------
-# MODEL
-# -------------------------------
 @st.cache_resource
 def train_model():
     model = Pipeline([
@@ -74,20 +56,14 @@ def train_model():
 
 model = train_model()
 
-# -------------------------------
-# SIDEBAR
-# -------------------------------
 section = st.sidebar.radio(
     "Navigation",
     ["Prediction", "Analysis"]
 )
 
-# -------------------------------
-# PREDICTION
-# -------------------------------
 if section == "Prediction":
 
-    st.header("🔮 Fraud Prediction")
+    st.header("Fraud Prediction")
 
     idx = st.slider("Select Transaction", 0, len(X_test)-1, 0)
     sample = X_test.iloc[idx]
@@ -100,16 +76,13 @@ if section == "Prediction":
         prob = model.predict_proba(sample.values.reshape(1, -1))[0][1]
 
         if pred == 1:
-            st.error(f"🚨 Fraud Detected (Confidence: {prob:.2f})")
+            st.error(f"Fraud Detected (Confidence: {prob:.2f})")
         else:
-            st.success(f"✅ Legit Transaction (Confidence: {1 - prob:.2f})")
+            st.success(f"Legit Transaction (Confidence: {1 - prob:.2f})")
 
-# -------------------------------
-# ANALYSIS
-# -------------------------------
 else:
 
-    st.header("📊 Dataset Analysis")
+    st.header("Dataset Analysis")
 
     st.write("Shape:", df.shape)
 
@@ -119,7 +92,7 @@ else:
     st.subheader("Statistics")
     st.dataframe(df.describe())
 
-    # ---------------- HISTOGRAMS ----------------
+    #
     st.subheader("Feature Distributions")
 
     cols = df.columns[:12]
@@ -133,21 +106,20 @@ else:
     plt.tight_layout()
     st.pyplot(fig)
 
-    # ---------------- CONFUSION MATRIX ----------------
+   
     st.subheader("Confusion Matrix")
 
     fig_cm, ax_cm = plt.subplots()
     ConfusionMatrixDisplay.from_estimator(model, X_test, y_test, ax=ax_cm)
     st.pyplot(fig_cm)
 
-    # ---------------- ROC ----------------
+    
     st.subheader("ROC Curve")
 
     fig_roc, ax_roc = plt.subplots()
     RocCurveDisplay.from_estimator(model, X_test, y_test, ax=ax_roc)
     st.pyplot(fig_roc)
 
-    # ---------------- FEATURE IMPORTANCE ----------------
     st.subheader("Feature Importance")
 
     importances = model.named_steps["clf"].feature_importances_

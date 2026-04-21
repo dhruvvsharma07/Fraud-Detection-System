@@ -1,5 +1,4 @@
 # 💳 Credit Card Fraud Detection System
-
 An end-to-end Machine Learning project that detects fraudulent transactions using real-world financial data and is deployed as a live interactive web application.
 
 

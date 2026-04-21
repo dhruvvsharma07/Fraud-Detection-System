@@ -46,7 +46,11 @@ df = load_data()
 # ================================
 # SPLIT DATA
 # ================================
-X = df.drop("Class", axis=1)
+if "Class" not in df.columns:
+    st.error(f"❌ Class column missing. Columns: {df.columns}")
+    st.stop()
+
+X = df.drop(columns=["Class"])
 y = df["Class"]
 
 X_train, X_test, y_train, y_test = train_test_split(

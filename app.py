@@ -15,16 +15,21 @@ st.title("💳 Credit Card Fraud Detection System")
 
 @st.cache_data
 def load_data():
-    url = "https://storage.googleapis.com/download.tensorflow.org/data/creditcard.csv"
-    df = pd.read_csv(url)
+    from sklearn.datasets import fetch_openml
+    
+    data = fetch_openml("creditcard", version=1, as_frame=True)
+    df = data.frame
 
+    # Convert target column to int (important)
+    df["Class"] = df["Class"].astype(int)
+
+    # Optional sampling (your logic)
     df = df.groupby("Class", group_keys=False).apply(
         lambda x: x.sample(min(len(x), 25000), random_state=42)
     )
 
     return df
-
-df = load_data()
+    
 
 # -------------------------------
 # SPLIT DATA

@@ -21,21 +21,15 @@ def load_data():
     from sklearn.datasets import fetch_openml
     
     data = fetch_openml("creditcard", version=1, as_frame=True)
-    df = data.frame
 
-    # 🔥 CRITICAL FIX
-    df.columns = df.columns.str.strip()  # remove weird spaces
+    # 🔥 IMPORTANT: build dataframe manually
+    df = data.data
+    df["Class"] = data.target.astype(int)
 
-    # handle lowercase issue
-    if "class" in df.columns:
-        df.rename(columns={"class": "Class"}, inplace=True)
-
-    # safety check
+    # sanity check
     if "Class" not in df.columns:
-        st.error(f"Column 'Class' not found. Columns are: {df.columns}")
+        st.error(f"Class column missing. Columns: {df.columns}")
         st.stop()
-
-    df["Class"] = df["Class"].astype(int)
 
     # sampling
     df = df.groupby("Class", group_keys=False).apply(
@@ -45,14 +39,9 @@ def load_data():
     df = df.reset_index(drop=True)
 
     return df
-
-
-# 🔥 THIS WAS MISSING
 df = load_data()
 
-# -------------------------------
-# SPLIT DATA
-# -------------------------------
+
 X = df.drop("Class", axis=1)
 y = df["Class"]
 

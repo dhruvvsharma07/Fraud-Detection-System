@@ -3,6 +3,7 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 
+from sklearn.datasets import fetch_openml
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
 from sklearn.pipeline import Pipeline
@@ -14,24 +15,23 @@ st.set_page_config(page_title="Fraud Detection System", layout="wide")
 st.title("💳 Credit Card Fraud Detection System")
 
 # ================================
-# LOAD DATA
+# LOAD DATA (BULLETPROOF)
 # ================================
 @st.cache_data
 def load_data():
-    from sklearn.datasets import fetch_openml
-    
     data = fetch_openml("creditcard", version=1, as_frame=True)
 
-    # 🔥 IMPORTANT: build dataframe manually
-    df = data.data
-    df["Class"] = data.target.astype(int)
+    # ✅ Always safe construction
+    df = pd.DataFrame(data.data).copy()
 
-    # sanity check
+    # ✅ Add target explicitly
+    df["Class"] = pd.Series(data.target).astype(int)
+
+    # ✅ Final safety check
     if "Class" not in df.columns:
-        st.error(f"Class column missing. Columns: {df.columns}")
-        st.stop()
+        raise ValueError("❌ 'Class' column missing in dataset")
 
-    # sampling
+    # ✅ Reduce size (for Streamlit speed)
     df = df.groupby("Class", group_keys=False).apply(
         lambda x: x.sample(min(len(x), 25000), random_state=42)
     )
@@ -39,9 +39,13 @@ def load_data():
     df = df.reset_index(drop=True)
 
     return df
+
+
 df = load_data()
 
-
+# ================================
+# SPLIT DATA
+# ================================
 X = df.drop("Class", axis=1)
 y = df["Class"]
 
@@ -54,9 +58,9 @@ X_train, X_test, y_train, y_test = train_test_split(
 # ================================
 @st.cache_resource
 def train_model():
-    pipeline = Pipeline([
+    model = Pipeline([
         ("scaler", StandardScaler()),
-        ("model", RandomForestClassifier(
+        ("clf", RandomForestClassifier(
             n_estimators=50,
             max_depth=5,
             class_weight="balanced",
@@ -64,8 +68,9 @@ def train_model():
             n_jobs=-1
         ))
     ])
-    pipeline.fit(X_train, y_train)
-    return pipeline
+    model.fit(X_train, y_train)
+    return model
+
 
 model = train_model()
 
@@ -76,17 +81,17 @@ st.sidebar.title("Navigation")
 
 section = st.sidebar.radio(
     "Go to",
-    [" Prediction", "Analysis Dashboard"]
+    ["Prediction", "Analysis Dashboard"]
 )
 
-# =========================================================
+# ================================
 # 🔮 PREDICTION
-# =========================================================
-if section == " Prediction":
+# ================================
+if section == "Prediction":
 
-    st.header(" Fraud Prediction")
+    st.header("🔮 Fraud Prediction")
 
-    idx = st.slider("Select Transaction", 0, len(X_test)-1, 0)
+    idx = st.slider("Select Transaction", 0, len(X_test) - 1, 0)
 
     sample = X_test.iloc[idx]
     st.subheader("Transaction Data")
@@ -99,11 +104,11 @@ if section == " Prediction":
         if pred == 1:
             st.error(f"🚨 Fraud Detected (Confidence: {prob:.2f})")
         else:
-            st.success(f"✅ Legit Transaction (Confidence: {1-prob:.2f})")
+            st.success(f"✅ Legit Transaction (Confidence: {1 - prob:.2f})")
 
-# =========================================================
+# ================================
 # 📊 ANALYSIS
-# =========================================================
+# ================================
 elif section == "Analysis Dashboard":
 
     st.header("📊 Dataset Analysis")
@@ -138,14 +143,12 @@ elif section == "Analysis Dashboard":
 
     # ---------------- CONFUSION MATRIX ----------------
     st.subheader("Confusion Matrix")
-
     fig_cm, ax_cm = plt.subplots()
     ConfusionMatrixDisplay.from_estimator(model, X_test, y_test, ax=ax_cm)
     st.pyplot(fig_cm)
 
     # ---------------- ROC ----------------
     st.subheader("ROC Curve")
-
     fig_roc, ax_roc = plt.subplots()
     RocCurveDisplay.from_estimator(model, X_test, y_test, ax=ax_roc)
     st.pyplot(fig_roc)
@@ -153,7 +156,7 @@ elif section == "Analysis Dashboard":
     # ---------------- FEATURE IMPORTANCE ----------------
     st.subheader("Feature Importance")
 
-    importances = model.named_steps["model"].feature_importances_
+    importances = model.named_steps["clf"].feature_importances_
 
     fig_imp, ax_imp = plt.subplots()
     ax_imp.bar(range(len(importances)), importances)

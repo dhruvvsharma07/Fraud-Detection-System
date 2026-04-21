@@ -19,19 +19,25 @@ st.title("💳 Credit Card Fraud Detection System")
 # ================================
 @st.cache_data
 def load_data():
+    from sklearn.datasets import fetch_openml
+    
     data = fetch_openml("creditcard", version=1, as_frame=True)
 
-    # ✅ Always safe construction
-    df = pd.DataFrame(data.data).copy()
+    # ✅ Features
+    X = data.data.copy()
 
-    # ✅ Add target explicitly
-    df["Class"] = pd.Series(data.target).astype(int)
+    # ✅ Target (THIS WAS MISSING)
+    y = pd.Series(data.target, name="Class").astype(int)
 
-    # ✅ Final safety check
+    # ✅ Combine
+    df = pd.concat([X, y], axis=1)
+
+    # ✅ Safety check
     if "Class" not in df.columns:
-        raise ValueError("❌ 'Class' column missing in dataset")
+        st.error(f"Still missing Class. Columns: {df.columns}")
+        st.stop()
 
-    # ✅ Reduce size (for Streamlit speed)
+    # ✅ Sampling
     df = df.groupby("Class", group_keys=False).apply(
         lambda x: x.sample(min(len(x), 25000), random_state=42)
     )
@@ -39,9 +45,6 @@ def load_data():
     df = df.reset_index(drop=True)
 
     return df
-
-
-df = load_data()
 
 # ================================
 # SPLIT DATA

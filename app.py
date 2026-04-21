@@ -10,49 +10,43 @@ from sklearn.pipeline import Pipeline
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import ConfusionMatrixDisplay, RocCurveDisplay
 
+# -------------------------------
+# PAGE SETUP
+# -------------------------------
 st.set_page_config(page_title="Fraud Detection System", layout="wide")
-
 st.title("💳 Credit Card Fraud Detection System")
 
-# ================================
-# LOAD DATA (BULLETPROOF)
-# ================================
+# -------------------------------
+# LOAD DATA (SAFE VERSION)
+# -------------------------------
 @st.cache_data
 def load_data():
-    from sklearn.datasets import fetch_openml
-    
     data = fetch_openml("creditcard", version=1, as_frame=True)
 
-    # ✅ Features
+    # Features
     X = data.data.copy()
 
-    # ✅ Target (THIS WAS MISSING)
+    # Target (THIS IS IMPORTANT)
     y = pd.Series(data.target, name="Class").astype(int)
 
-    # ✅ Combine
+    # Combine
     df = pd.concat([X, y], axis=1)
-
-    # ✅ Safety check
-    if "Class" not in df.columns:
-        st.error(f"Still missing Class. Columns: {df.columns}")
-        st.stop()
-
-    # ✅ Sampling
-    df = df.groupby("Class", group_keys=False).apply(
-        lambda x: x.sample(min(len(x), 25000), random_state=42)
-    )
-
-    df = df.reset_index(drop=True)
 
     return df
 
-# ================================
-# SPLIT DATA
-# ================================
+# 🔥 MUST CALL THIS
+df = load_data()
+
+# -------------------------------
+# BASIC CHECK
+# -------------------------------
 if "Class" not in df.columns:
-    st.error(f"❌ Class column missing. Columns: {df.columns}")
+    st.error(f"Dataset error. Columns found: {df.columns}")
     st.stop()
 
+# -------------------------------
+# SPLIT DATA
+# -------------------------------
 X = df.drop(columns=["Class"])
 y = df["Class"]
 
@@ -60,9 +54,9 @@ X_train, X_test, y_train, y_test = train_test_split(
     X, y, test_size=0.2, random_state=42, stratify=y
 )
 
-# ================================
+# -------------------------------
 # MODEL
-# ================================
+# -------------------------------
 @st.cache_resource
 def train_model():
     model = Pipeline([
@@ -78,30 +72,27 @@ def train_model():
     model.fit(X_train, y_train)
     return model
 
-
 model = train_model()
 
-# ================================
+# -------------------------------
 # SIDEBAR
-# ================================
-st.sidebar.title("Navigation")
-
+# -------------------------------
 section = st.sidebar.radio(
-    "Go to",
-    ["Prediction", "Analysis Dashboard"]
+    "Navigation",
+    ["Prediction", "Analysis"]
 )
 
-# ================================
-# 🔮 PREDICTION
-# ================================
+# -------------------------------
+# PREDICTION
+# -------------------------------
 if section == "Prediction":
 
     st.header("🔮 Fraud Prediction")
 
-    idx = st.slider("Select Transaction", 0, len(X_test) - 1, 0)
-
+    idx = st.slider("Select Transaction", 0, len(X_test)-1, 0)
     sample = X_test.iloc[idx]
-    st.subheader("Transaction Data")
+
+    st.write("### Transaction Data")
     st.dataframe(sample)
 
     if st.button("Predict"):
@@ -113,20 +104,19 @@ if section == "Prediction":
         else:
             st.success(f"✅ Legit Transaction (Confidence: {1 - prob:.2f})")
 
-# ================================
-# 📊 ANALYSIS
-# ================================
-elif section == "Analysis Dashboard":
+# -------------------------------
+# ANALYSIS
+# -------------------------------
+else:
 
     st.header("📊 Dataset Analysis")
 
-    st.subheader("Dataset Overview")
     st.write("Shape:", df.shape)
 
     st.subheader("Class Distribution")
     st.bar_chart(df["Class"].value_counts())
 
-    st.subheader("Basic Statistics")
+    st.subheader("Statistics")
     st.dataframe(df.describe())
 
     # ---------------- HISTOGRAMS ----------------
@@ -143,19 +133,16 @@ elif section == "Analysis Dashboard":
     plt.tight_layout()
     st.pyplot(fig)
 
-    # ---------------- CORRELATION ----------------
-    st.subheader("Top Correlated Features")
-    corr = df.corr()["Class"].abs().sort_values(ascending=False).head(10)
-    st.write(corr)
-
     # ---------------- CONFUSION MATRIX ----------------
     st.subheader("Confusion Matrix")
+
     fig_cm, ax_cm = plt.subplots()
     ConfusionMatrixDisplay.from_estimator(model, X_test, y_test, ax=ax_cm)
     st.pyplot(fig_cm)
 
     # ---------------- ROC ----------------
     st.subheader("ROC Curve")
+
     fig_roc, ax_roc = plt.subplots()
     RocCurveDisplay.from_estimator(model, X_test, y_test, ax=ax_roc)
     st.pyplot(fig_roc)

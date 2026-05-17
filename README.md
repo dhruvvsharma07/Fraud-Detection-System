@@ -1,4 +1,10 @@
-# 💳 Credit Card Fraud Detection System
+<div align="center">
+<img src="https://img.shields.io/badge/Status-Live-brightgreen?style=for-the-badge" />
+<img src="https://img.shields.io/badge/ML-RandomForest-blue?style=for-the-badge&logo=scikit-learn" />
+<img src="https://img.shields.io/badge/Deployed-Streamlit-FF4B4B?style=for-the-badge&logo=streamlit" />
+
+ 
+ # 💳 Credit Card Fraud Detection System
 An end-to-end Machine Learning project that detects fraudulent transactions using real-world financial data and is deployed as a live interactive web application.
 
 

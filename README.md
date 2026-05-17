@@ -5,7 +5,7 @@
 
  
  # 💳 Credit Card Fraud Detection System
-**An end-to-end Machine Learning system that detects fraudulent transactions in real time — trained, evaluated, and deployed as a live web application.**
+**An end-to-end Machine Learning system that detects fraudulent transactions in real time trained, evaluated, and deployed as a live web application.**
 
 
 ## 🚀 Live Demo

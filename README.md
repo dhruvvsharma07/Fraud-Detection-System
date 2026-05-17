@@ -26,106 +26,117 @@ This is a **fully deployed fraud detection system**, not just a Jupyter notebook
  
 > Built to simulate what a production fraud detection pipeline might look like at a financial institution.
 
-## ⚙️ Features
-
-* 🔮 **Real-time Fraud Prediction**
-
-  * Select any transaction and instantly classify it as Fraud / Legit
-  * Displays confidence score
-
-* 📊 **Interactive Analysis Dashboard**
-
-  * Class distribution visualization
-  * Feature distributions (histograms)
-  * Correlation analysis
-
-* 🤖 **Machine Learning Pipeline**
-
-  * StandardScaler + RandomForestClassifier
-  * Handles class imbalance using weighted learning
-
-* 📈 **Model Evaluation**
-
-  * Confusion Matrix
-  * ROC Curve
-  * Feature Importance visualization
-
-
-
+## 🖥️ Live Demo
+ 
+🔗 **[frauddetectionsystem111.streamlit.app](https://frauddetectionsystem111.streamlit.app/)**
+ 
+Try selecting any transaction from the dataset and see the model classify it as **Fraud** or **Legit** — with a confidence score — in real time.
+ 
+---
+ 
+## ✨ Features
+ 
+| Feature | Description |
+|--------|-------------|
+| 🔮 **Real-Time Prediction** | Select a transaction → instant Fraud / Legit classification with confidence score |
+| 📊 **Interactive Dashboard** | Class distribution, feature histograms, correlation heatmap |
+| 🤖 **ML Pipeline** | StandardScaler + RandomForestClassifier with class imbalance handling |
+| 📈 **Model Evaluation** | Confusion matrix, ROC curve, and feature importance charts |
+| ⚡ **Deployed & Accessible** | Fully live — no local setup required |
+ 
+---
+ 
 ## 🧪 Tech Stack
-
-* **Frontend / App**: Streamlit
-* **Backend / ML**: Scikit-learn
-* **Data Handling**: Pandas, NumPy
-* **Visualization**: Matplotlib
-* **Dataset Source**: OpenML (Credit Card Fraud Dataset)
-
-
-
+ 
+```
+Frontend / UI     →  Streamlit
+ML / Backend      →  Scikit-learn (RandomForestClassifier, StandardScaler)
+Data Handling     →  Pandas, NumPy
+Visualization     →  Matplotlib
+Dataset Source    →  OpenML — ULB Credit Card Fraud Dataset
+```
+ 
+---
+ 
 ## 🗂️ Project Structure
-
+ 
 ```bash
 Fraud-Detection-System/
 │
-├── app.py                # Main Streamlit application
-├── requirements.txt      # Dependencies
-├── README.md             # Project documentation
+├── app.py               # Main Streamlit application (prediction + dashboard)
+├── requirements.txt     # Python dependencies
+└── README.md            # Project documentation
 ```
-
-
-
+ 
+---
+ 
 ## 🧩 Dataset
-
-* The dataset contains anonymized credit card transactions.
-* Features are PCA-transformed (V1–V28) for privacy.
-* Target variable:
-
-  * `0` → Legit transaction
-  * `1` → Fraudulent transaction
-
-
-
-## ⚡ Key Highlights
-
-* End-to-end ML system (not just a notebook)
-* Fully deployed and accessible online
-* Handles real-world constraints like:
-
-  * Large dataset limitations
-  * Deployment issues
-  * Data pipeline inconsistencies
-
-
-
-## 🧠 Learnings
-
-Through this project, I gained hands-on experience in:
-
-* Debugging real-world ML deployment issues
-* Handling dataset inconsistencies across platforms
-* Building production-ready ML pipelines
-* Deploying interactive ML applications
-
-
-
-## 🚀 Future Improvements
-
-* Add manual transaction input form
-* Improve UI/UX with dashboard styling
-* Optimize model performance further
-* Add API-based prediction system
-
-
-
+ 
+- **Source**: ULB Machine Learning Group, accessed via [OpenML](https://www.openml.org/)
+- **Size**: 284,807 transactions | **Fraud rate**: ~0.17% (highly imbalanced)
+- **Features**: 30 total — `Time`, `Amount`, and `V1–V28` (PCA-anonymized for privacy)
+- **Target**:
+  - `0` → Legitimate transaction
+  - `1` → Fraudulent transaction
+---
+ 
+## ⚙️ ML Pipeline
+ 
+```
+Raw Data
+   ↓
+StandardScaler (normalize Amount & Time)
+   ↓
+RandomForestClassifier
+   ├── class_weight='balanced'   ← handles severe class imbalance
+   └── trained on full dataset
+   ↓
+Evaluation: Confusion Matrix · ROC-AUC · Feature Importance
+   ↓
+Streamlit App → Real-Time Inference
+```
+ 
+---
+ 
+## 🏆 Key Highlights
+ 
+- ✅ **End-to-end system** — not just a model, but a full data-to-deployment pipeline
+- ✅ **Handles real-world constraints** — class imbalance, large dataset, deployment inconsistencies
+- ✅ **Live and accessible** — anyone can use it without installing anything
+- ✅ **Production mindset** — structured code, reproducible pipeline, clean UI
+---
+ 
+## 🧠 What I Learned
+ 
+- Debugging ML deployment issues in cloud environments (Streamlit Cloud)
+- Managing class imbalance without oversampling (weighted learning)
+- Handling dataset inconsistencies across local and remote environments
+- Building and deploying a production-ready ML pipeline end-to-end
+---
+ 
+## 🚀 Planned Improvements
+ 
+- [ ] Manual transaction input form (enter custom values for prediction)
+- [ ] Enhanced UI/UX with better dashboard theming
+- [ ] Experiment with XGBoost / LightGBM for performance gains
+- [ ] REST API endpoint for programmatic predictions
+---
+ 
 ## 🙌 Acknowledgements
-
-* Dataset originally sourced from ULB Machine Learning Group
-* Accessed via OpenML
-
-
-
+ 
+- Dataset by the **ULB Machine Learning Group** — accessed via [OpenML](https://www.openml.org/d/1597)
+- Deployment powered by **Streamlit Community Cloud**
+---
+ 
 ## 📬 Connect
-
-If you found this project interesting, feel free to connect or reach out!
+ 
+Found this interesting? Feel free to ⭐ the repo or reach out!
+ 
+<div align="center">
+---
+*Built with curiosity, debugged with patience.*
+ 
+</div>
+ 
 
 

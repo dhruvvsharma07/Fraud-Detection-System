@@ -14,6 +14,9 @@
 ## 📌 What This Project Does
  
 This is a **fully deployed fraud detection system**, not just a Jupyter notebook. It ingests anonymized credit card transaction data, trains a machine learning model, evaluates it rigorously, and serves real-time predictions through an interactive dashboard — all in one pipeline.
+> Built to simulate what a production fraud detection pipeline might look like at a financial institution.
+ 
+---
 
 
 

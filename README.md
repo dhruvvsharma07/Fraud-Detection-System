@@ -7,9 +7,10 @@
  # 💳 Credit Card Fraud Detection System
 **An end-to-end Machine Learning system that detects fraudulent transactions in real time trained, evaluated, and deployed as a live dashboard**
 
-## 🚀 Live Demo
-
-🔗 https://frauddetectionsystem111.streamlit.app/
+[![Live Demo](https://img.shields.io/badge/🔗_Live_Demo-Click_Here-0066FF?style=for-the-badge)](https://frauddetectionsystem111.streamlit.app/)
+ 
+</div>
+---
 
 
 
